@@ -8,6 +8,10 @@ type JobInterface interface {
 	Handler() error
 }
 
+type WorkInterface interface {
+	Start()
+}
+
 // A buffered channel that we can send work requests on.
 var JobQueue chan JobInterface
 
@@ -18,7 +22,7 @@ type Worker struct {
 	quit    	chan bool
 }
 
-func NewWorker(workerPool chan chan JobInterface) Worker {
+func NewWorker(workerPool chan chan JobInterface) WorkInterface {
 	return Worker{
 		WorkerPool: workerPool,
 		JobChannel: make(chan JobInterface),

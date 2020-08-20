@@ -4,6 +4,7 @@ type Dispatcher struct {
 	// A pool of workers channels that are registered with the dispatcher
 	WorkerPool chan chan JobInterface
 	MaxWorkers int
+	NewWorkerFunc func(workerPool chan chan JobInterface) WorkInterface
 }
 
 func NewDispatcher(maxWorkers int) *Dispatcher {
@@ -11,13 +12,14 @@ func NewDispatcher(maxWorkers int) *Dispatcher {
 	return &Dispatcher{
 		WorkerPool: pool,
 		MaxWorkers: maxWorkers,
+		NewWorkerFunc: NewWorker,
 	}
 }
 
 func (d *Dispatcher) Run() {
 	// starting n number of workers
 	for i := 0; i < d.MaxWorkers; i++ {
-		worker := NewWorker(d.WorkerPool)
+		worker := d.NewWorkerFunc(d.WorkerPool)
 		worker.Start()
 	}
 
